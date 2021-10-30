@@ -40,13 +40,13 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Static"
 }
 
-resource "azurerm_public_ip" "public_ip_toVM" {
-  count = 2 
-  name                = "Publick_IP${count.index+1}"
-  resource_group_name = var.ResourceGroup_name
-  location            = var.ResourceGroup_location
-  allocation_method   = "Static"
-}
+# resource "azurerm_public_ip" "public_ip_toVM" {
+#   count = 2 
+#   name                = "Publick_IP${count.index+1}"
+#   resource_group_name = var.ResourceGroup_name
+#   location            = var.ResourceGroup_location
+#   allocation_method   = "Static"
+# }
 
 
 
@@ -61,45 +61,9 @@ module "VM" {
   pass                      = var.pass
   availabilitySetId         = azurerm_availability_set.availability_set.id
   subNet                    = azurerm_subnet.subnetVM.id
-  publick_ip_address_id     = azurerm_public_ip.public_ip_toVM[count.index].id
+  #publick_ip_address_id     = azurerm_public_ip.public_ip_toVM[count.index].id
 
 }
-
-
-
-
-
-#                     VM's
-
-# resource "azurerm_linux_virtual_machine" "AppVM" {
-#   count                           = length(var.name_count)
-#   name                            = "AppVM-${count.index+1}"
-#   resource_group_name             = var.ResourceGroup_name
-#   location                        = var.ResourceGroup_location
-#   size                            = "Standard_F2"
-#   admin_username                  = var.userName
-#   admin_password                  = var.pass
-#   disable_password_authentication = false
-#   availability_set_id = azurerm_availability_set.availability_set.id
-#   depends_on = [
-#     azurerm_network_interface.NIC_VM
-#   ]
-#   network_interface_ids = [element(azurerm_network_interface.NIC_VM.*.id, count.index)]
-
-#   os_disk {
-#     caching              = "ReadWrite"
-#     storage_account_type = "Standard_LRS"
-#   }
-
-#   source_image_reference {
-#     publisher = "Canonical"
-#     offer     = "UbuntuServer"
-#     sku       = "16.04-LTS"
-#     version   = "latest"
-#   }
-# }
-
-
 
 # Managed Postgres
 
@@ -136,50 +100,6 @@ resource "azurerm_postgresql_firewall_rule" "postgres_firewall" {
 #   name                = azurerm_public_ip.public_ip.name
 #   resource_group_name = var.ResourceGroup_name
 # }
-
-
-
-# #NICVM! Network interface for WEBVM
-# resource "azurerm_network_interface" "NIC_VM" {
-#   count               = 2
-#   name                = "NIC_VM${count.index+1}"
-#   location            = var.ResourceGroup_location
-#   resource_group_name = var.ResourceGroup_name
-#   ip_configuration {
-#     name                          = "internal${count.index}"
-#     subnet_id                     = azurerm_subnet.subnetVM.id
-#     private_ip_address_allocation = "Dynamic"
-#     public_ip_address_id          = azurerm_public_ip.public_ip_toVM[count.index].id
-#   }
-# }
-
-#NICVM2
-# resource "azurerm_network_interface" "NIC_VM2" {
-#   name                = "NIC_VM2"
-#   location            = var.ResourceGroup_location
-#   resource_group_name = var.ResourceGroup_name
-#   ip_configuration {
-#     name                          = "internal"
-#     subnet_id                     = azurerm_subnet.subnetVM.id
-#     private_ip_address_allocation = "Dynamic"
-#     #public_ip_address_id          = azurerm_public_ip.public_ip.id
-#   }
-# }
-
-# #Network interface for SQLVM
-# resource "azurerm_network_interface" "NIC_SQL" {
-#   name                = "NIC_SQL"
-#   location            = var.ResourceGroup_location
-#   resource_group_name = var.ResourceGroup_name
-
-#   ip_configuration {
-#     name                          = "internal"
-#     subnet_id                     = azurerm_subnet.subnetSQL.id
-#     private_ip_address_allocation = "Dynamic"
-#   }
-# }
-
-
 
 
 # LOAD BALANCER

@@ -33,6 +33,6 @@ resource "azurerm_network_interface" "NIC_VM" {
     name                          = "internal"
     subnet_id                     = var.subNet
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = var.publick_ip_address_id
+    # public_ip_address_id          = var.publick_ip_address_id
   }
 }
