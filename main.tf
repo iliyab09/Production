@@ -40,21 +40,12 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Static"
 }
 
-# resource "azurerm_public_ip" "public_ip_toVM" {
-#   count = 2 
-#   name                = "Publick_IP${count.index+1}"
-#   resource_group_name = var.ResourceGroup_name
-#   location            = var.ResourceGroup_location
-#   allocation_method   = "Static"
-# }
-
-
 
 
 module "VM" {
   count                     = 2
   source                    = "./modules/VMs"
-  VM_Name                   = "VM${count.index+1}"
+  VM_Name                   = "VMProd${count.index+1}"
   ResourceGroup_name        = var.ResourceGroup_name
   ResourceGroup_location    = var.ResourceGroup_location
   userName                  = var.userName
@@ -114,17 +105,6 @@ resource "azurerm_lb" "LoadBalancer" {
   }
 }
 
-# Load Balancer rules
-resource "azurerm_lb_rule" "lb_rule1" {
-  resource_group_name = var.ResourceGroup_name
-  loadbalancer_id = azurerm_lb.LoadBalancer.id
-  name = "lb_rule1"
-  protocol = "Tcp"
-  frontend_port = 22
-  backend_port = 22
-  frontend_ip_configuration_name = "FronEndPublicIPAddress"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.backend_pool.id
-  }
 
 resource "azurerm_lb_rule" "lb_rule2" {
   resource_group_name = var.ResourceGroup_name
@@ -152,13 +132,6 @@ resource "azurerm_lb_backend_address_pool" "backend_pool"{
 }
 
 
-
-
-
-#"internal"
-
-
-
 # Create the avalibility Set
 resource "azurerm_availability_set" "availability_set" {
   name                = "AS"
@@ -170,6 +143,38 @@ resource "azurerm_availability_set" "availability_set" {
   }
 }
 
+resource "azurerm_lb_nat_rule" "example1" {
+  resource_group_name            = var.ResourceGroup_name
+  loadbalancer_id                = azurerm_lb.LoadBalancer.id
+  name                           = "GrantAccess1"
+  protocol                       = "Tcp"
+  frontend_port                  = 10000
+  backend_port                   = 22
+  frontend_ip_configuration_name = "FronEndPublicIPAddress"
+}
+
+resource "azurerm_lb_nat_rule" "example2" {
+  resource_group_name            = var.ResourceGroup_name
+  loadbalancer_id                = azurerm_lb.LoadBalancer.id
+  name                           = "GrantAccess2"
+  protocol                       = "Tcp"
+  frontend_port                  = 10001
+  backend_port                   = 22
+  frontend_ip_configuration_name = "FronEndPublicIPAddress"
+}
+
+
+resource "azurerm_network_interface_nat_rule_association" "example1" {
+  network_interface_id  = module.VM[0].NetworkInterface
+  ip_configuration_name = "internal"
+  nat_rule_id           = azurerm_lb_nat_rule.example1.id
+}
+
+resource "azurerm_network_interface_nat_rule_association" "example2" {
+  network_interface_id  = module.VM[1].NetworkInterface
+  ip_configuration_name = "internal"
+  nat_rule_id           = azurerm_lb_nat_rule.example2.id
+}
 
 resource "azurerm_network_interface_backend_address_pool_association" "example" {
   count                     = 2
