@@ -1,5 +1,7 @@
 # TerraformForAzure-IaC
 
+<img width="356" alt="6r0bN-GSK" src="https://user-images.githubusercontent.com/16802411/140619115-e374a023-89ac-4875-afc5-4554ad195c4c.png">
+
 Terraform is an open-source infrastructure as code software tool that provides a consistent CLI workflow to manage hundreds of cloud services. Terraform codifies cloud APIs into declarative configuration files.
 
 Terraform is a widely used tool that helps automate the provisioning of infrastructure and when used in combination with tools like Ansible we can automate the whole process from nothing to having applications running in already configured infrastructure.
